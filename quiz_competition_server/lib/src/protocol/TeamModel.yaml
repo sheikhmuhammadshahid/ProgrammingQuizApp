@@ -1,0 +1,14 @@
+class: TeamModel
+table: teamtable
+fields:
+  teamName: String
+  # status: String
+  teamType: String
+  scores: int
+  totalMembers: int
+  buzzerRound: int
+  mcqRound: int
+  rapidRound: int
+  buzzerWrong: int
+  
+  

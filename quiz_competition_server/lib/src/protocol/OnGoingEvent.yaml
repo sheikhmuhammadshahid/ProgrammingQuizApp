@@ -1,0 +1,10 @@
+class: OnGoingEvent
+table: ongoingevent
+fields:
+  question: Question?
+  eventId: int
+  questionForTeam: String
+  round: String
+  # pressedBy: String
+  questionNo: int
+  totalQuestions: int

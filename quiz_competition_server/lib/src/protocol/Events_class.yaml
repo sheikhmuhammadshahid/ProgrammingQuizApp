@@ -1,0 +1,7 @@
+class: EventModel
+table: eventmodel
+fields:
+  date: DateTime?
+  type: String
+  tTeams: int
+  status: String

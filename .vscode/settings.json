@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 8090,
+            "driver": "PostgreSQL",
+            "name": "Quiz Competition",
+            "database": "quiz_competition",
+            "username": "postgres",
+            "password": "aY5kGRqpthBHKl647dlyEKrySlNRSrtz"
+        }
+    ]
+}

@@ -1,0 +1,5 @@
+class: TeamInfoModel
+table: teaminfotable
+fields:
+  teamId: int
+  memberId: int

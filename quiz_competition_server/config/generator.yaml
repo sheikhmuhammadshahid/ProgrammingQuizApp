@@ -1,0 +1,6 @@
+type: server
+
+client_package_path: ../quiz_competition_client
+modules:
+  serverpod_auth:
+    nickname: auth

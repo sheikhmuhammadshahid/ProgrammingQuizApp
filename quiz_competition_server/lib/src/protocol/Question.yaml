@@ -1,0 +1,11 @@
+class: Question
+table: question
+fields:
+  ques: String
+  opt1: String
+  opt2: String
+  opt3: String
+  opt4: String
+  answer: String
+  type: String
+  eventId: int

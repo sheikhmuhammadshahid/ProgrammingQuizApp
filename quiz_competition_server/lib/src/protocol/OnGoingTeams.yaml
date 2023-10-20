@@ -1,0 +1,5 @@
+class: OnGoingTeams
+fields:
+  members: List<MemberModel>
+  team: TeamModel
+  teamId: int

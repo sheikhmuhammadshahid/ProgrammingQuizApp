@@ -1,0 +1,9 @@
+class: MemberModel
+table: membertable
+fields:
+  name: String
+  image: String
+  phoneNo: String
+  aridNo: String
+  semester: String
+

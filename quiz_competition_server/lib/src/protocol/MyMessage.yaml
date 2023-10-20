@@ -1,0 +1,5 @@
+class: MyMessage
+fields:
+  todo: String
+  value: String
+  

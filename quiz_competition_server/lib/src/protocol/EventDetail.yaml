@@ -1,0 +1,6 @@
+class: EventDetail
+table: eventdetail
+fields:
+  eventId: int
+  teamId: int
+  

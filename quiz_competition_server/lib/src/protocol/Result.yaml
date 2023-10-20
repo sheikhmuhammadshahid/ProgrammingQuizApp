@@ -1,0 +1,4 @@
+class: ResultApi
+fields:
+  status: int
+  message: String
