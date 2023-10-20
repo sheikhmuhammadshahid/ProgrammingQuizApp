@@ -49,11 +49,12 @@ class ClientProvider extends ChangeNotifier {
     }
     questionNo = 0;
     questions = [];
-    notifyListeners();
+    // notifyListeners();
     questions = allQuestions
         .where((element) =>
             element.type.toLowerCase().contains(round.toString().toLowerCase()))
         .toList();
+
     try {
       await client.pixorama.sendStreamMessage(OnGoingEvent(
           eventId: eventId,
