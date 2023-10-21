@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:serverpod/serverpod.dart';
 
 import 'package:quiz_competition_server/src/web/routes/root.dart';
@@ -16,6 +18,10 @@ void run(List<String> args) async {
     Protocol(),
     Endpoints(),
   );
+  try {
+    String ip = InternetAddress.anyIPv4.address;
+    // pod.config.apiServer.
+  } catch (e) {}
 
   // If you are using any future calls, they need to be registered here.
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');
@@ -39,6 +45,7 @@ void run(List<String> args) async {
     RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
     '/*',
   );
+  // Serverpod(args, serializationManager, endpoints)
   // Start the server.
   await pod.start();
 }

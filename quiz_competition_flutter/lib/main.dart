@@ -23,7 +23,7 @@ import 'screens/welcome/welcome_screen.dart';
 // the default port. You will need to modify this to connect to staging or
 // production servers.
 var client = Client(
-  'http://192.168.10.12:8080/',
+  'http://192.168.100.13:8080/',
   authenticationKeyManager: FlutterAuthenticationKeyManager(),
 )..connectivityMonitor = FlutterConnectivityMonitor();
 late SessionManager sessionManager;
