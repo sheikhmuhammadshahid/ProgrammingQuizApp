@@ -106,7 +106,7 @@ class PixoramaEndpoint extends Endpoint {
 
   sendMessages(message) async {
     for (var element in sessions) {
-      await sendStreamMessage(element, message);
+      sendStreamMessage(element, message);
     }
   }
 

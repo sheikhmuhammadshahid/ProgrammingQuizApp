@@ -39,7 +39,15 @@ class EventEndpoint extends Endpoint {
     Session session,
   ) async {
     try {
-      return EventModel.find(session);
+      List<EventModel> events = await EventModel.find(session);
+      for (var i = 0; i < events.length; i++) {
+        events[i].tTeams = (await EventDetail.find(
+          session,
+          where: (p0) => p0.eventId.equals(events[i].id),
+        ))
+            .length;
+      }
+      return events;
     } catch (e) {}
     return [];
   }

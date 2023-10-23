@@ -25,6 +25,8 @@ class AddQuestionsScreen extends StatefulWidget {
 class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
   List<Question> excelDataList = [];
 
+  bool isChanged = false;
+
   @override
   initState() {
     super.initState();
@@ -39,6 +41,17 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
         isGettingquestions = false;
       },
     );
+  }
+
+  saveQuestions() async {
+    try {
+      EasyLoading.show(status: 'Saving Questions...');
+      var res = await client.question.addQuestions(
+          questions:
+              excelDataList.where((element) => element.id == 0).toList());
+      EasyLoading.dismiss();
+      EasyLoading.showToast(res.message);
+    } catch (e) {}
   }
 
   bool isGettingquestions = true;
@@ -103,192 +116,225 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
   @override
   Widget build(BuildContext context) {
     // questionController.gval.value = 0;
-    return isGettingquestions
-        ? const Center(
-            child: CircularProgressIndicator(),
-          )
-        : Scaffold(
-            appBar: AppBar(
+    return WillPopScope(
+      onWillPop: () async {
+        if (isChanged) {
+          return await showCupertinoModalPopup(
+            context: context,
+            builder: (context) => AlertDialog(
               actions: [
                 ElevatedButton(
-                    onPressed: () async {
-                      await showCupertinoModalPopup(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          actions: [
-                            ElevatedButton(
-                                onPressed: () async {
-                                  try {
-                                    EasyLoading.show(
-                                        status: 'Saving Questions...');
-                                    var res = await client.question
-                                        .addQuestions(
-                                            questions: excelDataList
-                                                .where((element) =>
-                                                    element.id == 0)
-                                                .toList());
-                                    EasyLoading.dismiss();
-                                    EasyLoading.showToast(res.message);
-                                    // Get.back();
-                                  } catch (e) {
-                                    print(e);
-                                  }
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('Yes')),
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text('No'))
-                          ],
-                          content: const Text('Are you sure to save this?'),
-                        ),
-                      );
+                    onPressed: () {
+                      Navigator.pop(context, true);
                     },
-                    child: const Text('Save'))
+                    child: const Text('Exit')),
+                ElevatedButton(
+                    onPressed: () async {
+                      await saveQuestions();
+                      Navigator.pop(context, true);
+                    },
+                    child: const Text('Save?'))
               ],
-              // title: Text(widget.event.type),
+              content: const Text(
+                  'You have some changes to save.\n Please make sure to save them first'),
+              icon: Align(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context, false);
+                      },
+                      icon: const Icon(Icons.cancel))),
             ),
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  FittedBox(
-                    child: Row(
-                      children: [
-                        ElevatedButton(
-                            onPressed: () async {
-                              showDialog(
-                                context: context,
-                                builder: (context) => AlertDialog(
-                                  content: const Text(
-                                      'Question | opt1 | opt2 | opt3 | opt4 | correct | type | eventId'),
-                                  actions: [
-                                    ElevatedButton(
-                                        onPressed: () async {
-                                          await pickFile();
-                                        },
-                                        child: const Text('Pick file'))
-                                  ],
-                                  title: const Text(
-                                      'Make sure your excel data should be like this!'),
-                                  icon: Align(
-                                      alignment: Alignment.topRight,
-                                      child: IconButton(
-                                          onPressed: () {
-                                            Get.back();
-                                          },
-                                          icon: const Icon(Icons.cancel))),
-                                ),
-                              );
-                            },
-                            child: const Text('Read Questions')),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        ElevatedButton(
-                            onPressed: () async {
-                              quesController.text = opt1Controller.text =
-                                  opt2Controller.text = opt3Controller.text =
-                                      opt4Controller.text = '';
-                              questionController.gval.value = 0;
-                              await getAddQuestionDialogue(false, 0);
-                            },
-                            child: const Text('Add ')),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(
-                    height: 5,
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.85,
-                    child: ListView.builder(
-                        itemCount: excelDataList.length,
-                        itemBuilder: (context, index) {
-                          Question question = excelDataList[index];
-                          return Card(
-                            child: Stack(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      top: 35, left: 25, bottom: 20),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Question: ${question.ques}"),
-                                        Text("Option1: ${question.opt1}"),
-                                        Text("Option2: ${question.opt2}"),
-                                        Text("Option3: ${question.opt3}"),
-                                        Text("Option4: ${question.opt4}"),
-                                        Text("Answer: ${question.answer}"),
-                                        Text("Type: ${question.type}")
-                                      ]),
-                                ),
-                                Align(
-                                  alignment: Alignment.topRight,
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      IconButton(
-                                          onPressed: () async {
-                                            questionController.gval.value =
-                                                question.opt1 == question.answer
-                                                    ? 1
-                                                    : question.opt2 ==
-                                                            question.answer
-                                                        ? 2
-                                                        : question.opt3 ==
-                                                                question.answer
-                                                            ? 3
-                                                            : 4;
-
-                                            quesController.text = question.ques;
-                                            opt1Controller.text = question.opt1;
-                                            opt2Controller.text = question.opt2;
-                                            opt3Controller.text = question.opt3;
-                                            opt4Controller.text = question.opt4;
-                                            context
-                                                .read<ClientProvider>()
-                                                .changeQuestionType(
-                                                    type: question.type);
-                                            await getAddQuestionDialogue(
-                                                true, index);
-                                          },
-                                          icon: const Icon(
-                                              Icons.edit_calendar_outlined)),
-                                      IconButton(
-                                          onPressed: () async {
-                                            excelDataList.remove(question);
-
-                                            setState(() {});
-                                            await client.question
-                                                .deleteQuestion(
-                                                    question: question);
-                                          },
-                                          icon: const Icon(
-                                            Icons.delete,
-                                            color: Colors.red,
-                                          )),
-                                    ],
-                                  ),
-                                ),
-                                Card(
-                                  color: Colors.teal,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Text((index + 1).toString()),
-                                  ),
-                                )
+          );
+        } else {
+          return true;
+        }
+      },
+      child: isGettingquestions
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : Scaffold(
+              appBar: AppBar(
+                actions: [
+                  if (isChanged)
+                    ElevatedButton(
+                        onPressed: () async {
+                          await showCupertinoModalPopup(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              actions: [
+                                ElevatedButton(
+                                    onPressed: () async {
+                                      try {
+                                        await saveQuestions();
+                                        // Get.back();
+                                      } catch (e) {
+                                        print(e);
+                                      }
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('Yes')),
+                                ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text('No'))
                               ],
+                              content: const Text('Are you sure to save this?'),
                             ),
                           );
-                        }),
-                  ),
+                        },
+                        child: const Text('Save'))
                 ],
+                // title: Text(widget.event.type),
               ),
-            ));
+              body: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    FittedBox(
+                      child: Row(
+                        children: [
+                          ElevatedButton(
+                              onPressed: () async {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    content: const Text(
+                                        'Question | opt1 | opt2 | opt3 | opt4 | correct | type | eventId'),
+                                    actions: [
+                                      ElevatedButton(
+                                          onPressed: () async {
+                                            await pickFile();
+                                          },
+                                          child: const Text('Pick file'))
+                                    ],
+                                    title: const Text(
+                                        'Make sure your excel data should be like this!'),
+                                    icon: Align(
+                                        alignment: Alignment.topRight,
+                                        child: IconButton(
+                                            onPressed: () {
+                                              Get.back();
+                                            },
+                                            icon: const Icon(Icons.cancel))),
+                                  ),
+                                );
+                              },
+                              child: const Text('Read Questions')),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          ElevatedButton(
+                              onPressed: () async {
+                                quesController.text = opt1Controller.text =
+                                    opt2Controller.text = opt3Controller.text =
+                                        opt4Controller.text = '';
+                                questionController.gval.value = 0;
+                                await getAddQuestionDialogue(false, 0);
+                              },
+                              child: const Text('Add ')),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 5,
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.85,
+                      child: ListView.builder(
+                          itemCount: excelDataList.length,
+                          itemBuilder: (context, index) {
+                            Question question = excelDataList[index];
+                            return Card(
+                              child: Stack(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        top: 35, left: 25, bottom: 20),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text("Question: ${question.ques}"),
+                                          Text("Option1: ${question.opt1}"),
+                                          Text("Option2: ${question.opt2}"),
+                                          Text("Option3: ${question.opt3}"),
+                                          Text("Option4: ${question.opt4}"),
+                                          Text("Answer: ${question.answer}"),
+                                          Text("Type: ${question.type}")
+                                        ]),
+                                  ),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        IconButton(
+                                            onPressed: () async {
+                                              questionController
+                                                  .gval.value = question.opt1 ==
+                                                      question.answer
+                                                  ? 1
+                                                  : question.opt2 ==
+                                                          question.answer
+                                                      ? 2
+                                                      : question.opt3 ==
+                                                              question.answer
+                                                          ? 3
+                                                          : 4;
+
+                                              quesController.text =
+                                                  question.ques;
+                                              opt1Controller.text =
+                                                  question.opt1;
+                                              opt2Controller.text =
+                                                  question.opt2;
+                                              opt3Controller.text =
+                                                  question.opt3;
+                                              opt4Controller.text =
+                                                  question.opt4;
+                                              context
+                                                  .read<ClientProvider>()
+                                                  .changeQuestionType(
+                                                      type: question.type);
+                                              await getAddQuestionDialogue(
+                                                  true, index);
+                                            },
+                                            icon: const Icon(
+                                                Icons.edit_calendar_outlined)),
+                                        IconButton(
+                                            onPressed: () async {
+                                              excelDataList.remove(question);
+
+                                              setState(() {});
+                                              await client.question
+                                                  .deleteQuestion(
+                                                      question: question);
+                                            },
+                                            icon: const Icon(
+                                              Icons.delete,
+                                              color: Colors.red,
+                                            )),
+                                      ],
+                                    ),
+                                  ),
+                                  Card(
+                                    color: Colors.teal,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Text((index + 1).toString()),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          }),
+                    ),
+                  ],
+                ),
+              )),
+    );
   }
 
   String? type;
@@ -413,6 +459,7 @@ class _AddQuestionsScreenState extends State<AddQuestionsScreen> {
                         excelDataList.removeAt(index);
                         excelDataList.insert(index, question);
                       } else {
+                        isChanged = true;
                         excelDataList.add(question);
                       }
                       Navigator.pop(context);
